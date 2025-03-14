@@ -32,10 +32,13 @@ source ../.env
 # Create or switch to the specified namespace
 oc new-project "$namespace" || oc project "$namespace"
 
-
 curl -LO https://raw.githubusercontent.com/redhat-developer/rhdh-operator/refs/heads/release-$version/.rhdh/scripts/install-rhdh-catalog-source.sh
 chmod +x install-rhdh-catalog-source.sh
 ./install-rhdh-catalog-source.sh -v $version --install-operator rhdh
+
+# Get cluster router base and set RHDH URL
+CLUSTER_ROUTER_BASE=$(oc get route console -n openshift-console -o=jsonpath='{.spec.host}' | sed 's/^[^.]*\.//')
+export RHDH_BASE_URL="https://backstage-developer-hub-${namespace}.${CLUSTER_ROUTER_BASE}"
 
 # Apply secrets
 envsubst < rhdh-secrets.yaml | oc apply -f -
@@ -51,8 +54,14 @@ oc create configmap dynamic-plugins \
     --namespace="$namespace" \
     --dry-run=client -o yaml | oc apply -f -
 
+timeout 300 bash -c '
+while ! oc get crd/backstages.rhdh.redhat.com -n "${namespace}" >/dev/null 2>&1; do
+    echo "Waiting for Backstage CRD to be created..."
+    sleep 20
+done
+echo "Backstage CRD is created."
+' || echo "Error: Timed out waiting for Backstage CRD creation."
+
+oc apply -f "subscription.yaml" -n "$namespace"
+
 echo "done"
-
-# oc apply -f "subscription.yaml" -n "$namespace"
-
-
