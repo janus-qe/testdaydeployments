@@ -4,8 +4,6 @@ auth:
   session:
     secret: superSecretSecret 
   providers:
-    guest:
-      dangerouslyAllowOutsideDevelopment: true
     oidc:
       production:
         metadataUrl: "${KEYCLOAK_METADATA_URL}"
@@ -14,8 +12,6 @@ auth:
         prompt: auto
         callbackUrl: "$RHDH_BASE_URL/api/auth/oidc/handler/frame"
 signInPage: oidc
-permission:
-  enabled: false
 catalog:
   import:
     entityFilename: catalog-info.yaml
