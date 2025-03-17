@@ -17,7 +17,6 @@ This repository provides scripts and configuration files to deploy **Red Hat Dev
 | |____subscription.yaml               # RHDH Subscription manifest
 | |____dynamic-plugins.yaml            # Dynamic plugins configuration
 | |____op-install.sh                   # Operator installation script
-| |____install-rhdh-catalog-source.sh  # Catalog source installation script
 | |____app-config-rhdh.yaml            # Application configuration
 |____.env                              # Environment variables file
 ```
