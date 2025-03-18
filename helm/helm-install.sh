@@ -55,6 +55,6 @@ helm upgrade redhat-developer-hub -i "${CHART_URL}" --version "$CV" \
     --set global.clusterRouterBase="${CLUSTER_ROUTER_BASE}"
 
 echo "
-Once deployed, Developer Hub $CV will be available at
-https://redhat-developer-hub-${namespace}.${CLUSTER_ROUTER_BASE}
+Once deployed, Developer Hub $CV will be available at 
+$RHDH_BASE_URL
 "

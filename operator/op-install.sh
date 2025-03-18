@@ -64,4 +64,7 @@ echo "Backstage CRD is created."
 
 oc apply -f "subscription.yaml" -n "$namespace"
 
-echo "done"
+echo "
+RHDH_BASE_URL : 
+$RHDH_BASE_URL
+"
