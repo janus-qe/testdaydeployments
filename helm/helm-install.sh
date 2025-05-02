@@ -38,8 +38,6 @@ CHART_URL="oci://quay.io/rhdh/chart"
 
 if ! helm show chart $CHART_URL --version $CV &> /dev/null; then github=1; fi
 if [[ $github -eq 1 ]]; then
-    # If a Github CI chart, create a chart repo
-    if [[ $CV == *"-CI" ]]; then chartrepo=1; fi
     CHART_URL="https://github.com/rhdh-bot/openshift-helm-charts/raw/redhat-developer-hub-${CV}/charts/redhat/redhat/redhat-developer-hub/${CV}/redhat-developer-hub-${CV}.tgz"
     oc apply -f "https://github.com/rhdh-bot/openshift-helm-charts/raw/redhat-developer-hub-${CV}/installation/rhdh-next-ci-repo.yaml"
 fi
