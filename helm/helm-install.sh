@@ -3,6 +3,7 @@ set -e
 
 namespace=""
 CV=""
+github=0 # by default don't use the Github repo unless the chart doesn't exist in the OCI registry
 
 # Parse named arguments
 for arg in "$@"; do
@@ -33,8 +34,17 @@ source ../.env
 oc new-project "$namespace" || oc project "$namespace"
 
 # Set up chart URL using the CV version
-CHART_URL="https://github.com/rhdh-bot/openshift-helm-charts/raw/redhat-developer-hub-${CV}/charts/redhat/redhat/redhat-developer-hub/${CV}/redhat-developer-hub-${CV}.tgz"
-oc apply -f "https://github.com/rhdh-bot/openshift-helm-charts/raw/redhat-developer-hub-${CV}/installation/rhdh-next-ci-repo.yaml"
+CHART_URL="oci://quay.io/rhdh/chart"
+
+if ! helm show chart $CHART_URL --version $CV &> /dev/null; then github=1; fi
+if [[ $github -eq 1 ]]; then
+    # If a Github CI chart, create a chart repo
+    if [[ $CV == *"-CI" ]]; then chartrepo=1; fi
+    CHART_URL="https://github.com/rhdh-bot/openshift-helm-charts/raw/redhat-developer-hub-${CV}/charts/redhat/redhat/redhat-developer-hub/${CV}/redhat-developer-hub-${CV}.tgz"
+    oc apply -f "https://github.com/rhdh-bot/openshift-helm-charts/raw/redhat-developer-hub-${CV}/installation/rhdh-next-ci-repo.yaml"
+fi
+
+echo "Using ${CHART_URL} to install Helm chart"
 
 # Get cluster router base and set RHDH URL
 CLUSTER_ROUTER_BASE=$(oc get route console -n openshift-console -o=jsonpath='{.spec.host}' | sed 's/^[^.]*\.//')
